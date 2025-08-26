@@ -1,20 +1,20 @@
 #!/bin/bash
 
-function print_help{
-	echo "info:"
-	printf "creates a ter.gz archive of <direcotory> in $HOME/Desktop/backups"
-	printf "appending the current date to the filename\n "
+function print_help {
+	
+	printf 'creates a tar.gz archive of <directory> in $HOME/Scrivania/backups'
+	printf " appending the current date to the filename\n "
 	echo "usage:"
 	echo "./backupit.sh <directory>"
 }
 
 
-function create_archive{
+function create_archive {
 
 	folder=$1
-	current-date=$2
+	current_date=$2
 	full_path=$3
-	backup_dir=$HOME/Desktop/backups
+	backup_dir=$HOME/Scrivania/backups
 	end_file=${folder}_${current_date}.tar.gz
 
 	#echo -e "\nfolder: $folder"
@@ -24,18 +24,20 @@ function create_archive{
 	#echo "end_file: $end_file" *
 	
 
-	file_exist=`ls $backup_dir | grep $end_file`
-		if[-z $file_exist]; then
+	file_exists=`ls $backup_dir | grep $end_file`
+		if [ -z $file_exists ]; then
 			echo "The file doesn't exist, creting the archive..."
-			tar cfz {$backup_dir}/${end_file}
+			cd ${full_path}
+			tar cfz ${backup_dir}/${end_file} *
+			echo "aaaa"
 		else
 			printf "The file exists, do you want to overwrithe it? [Y/n] "
 			read confirm
-				if["$confirm"== "y"]; then
+				if [ "$confirm" == "y" ]; then
 					echo "Overwrithing..."
 					cd ${full_path}
 					tar cfz ${backup_dir}/${end_file} *
-				elif ["$confirm" == "n"]; then
+				elif [ "$confirm" == "n" ]; then
 					echo "Quitting"
 				else
 					echo "quitting"
@@ -43,15 +45,21 @@ function create_archive{
 		fi
 }
 
-	if[-d "$1" ]; then
+	if [ -d "$1" ]; then
 		folder=$1
 		full_path=`readlink -f $1`
-		current_date=`date + %Y%m%d_%H%M`
+		current_date=`date +"%Y%m%d_%H%M"`
 		
-	if[! -d "$HOME/Desktop/backups"]; then
-		echo "$HOME/Desktop/backups directory doesn't exist , creating it..."
-		mkdir $HOME/Desktop/backups
-	fi
-	
-	echo"Compressing $full_path into archive $HOME/Desktop/backups/${folder}_${current_date}.tar.gz..."
+		if [ ! -d "$HOME/Scrivania/backups" ]; then
+			echo "$HOME/Scrivania/backups directory doesn't exist , creating it..."
+			mkdir $HOME/Scrivania/backups
+		fi
+	echo "Compressing $full_path into archive $HOME/Scrivania/backups/${folder}_${current_date}.tar.gz..."
 	create_archive $folder $current_date $full_path
+	
+	elif [ -z "$1" ]; then
+		print_help
+	else
+		echo -e "Not a directory"
+		print_help
+	fi
